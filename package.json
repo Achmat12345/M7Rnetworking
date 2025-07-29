@@ -1,0 +1,28 @@
+﻿{
+  "name": "m7rnetworking-project",
+  "version": "1.0.0",
+  "description": "M7Rnetworking - Creator Economy Platform",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "nodemon server/index.js",
+    "server": "cd server && npm run dev",
+    "client": "cd client && npm start",
+    "build": "npm run build:client",
+    "build:client": "cd client && npm run build",
+    "setup": "npm install && cd server && npm install"
+  },
+  "keywords": [
+    "creator-economy",
+    "ecommerce",
+    "ai-assistant",
+    "payfast",
+    "stripe"
+  ],
+  "author": "M7Rnetworking",
+  "license": "MIT",
+  "workspaces": [
+    "server",
+    "client"
+  ]
+}

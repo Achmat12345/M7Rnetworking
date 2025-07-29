@@ -1,0 +1,467 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>M7Rnetworking - Creator Economy Platform</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    body {
+      background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0a0a0a 100%);
+      color: #ffffff;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    .hero-pattern {
+      background-image: radial-gradient(circle at 25% 25%, #3B82F6 0%, transparent 50%),
+                        radial-gradient(circle at 75% 75%, #EF4444 0%, transparent 50%);
+      opacity: 0.1;
+    }
+    .feature-card {
+      backdrop-filter: blur(10px);
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .api-status {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 8px;
+    }
+    .status-online { background-color: #10B981; }
+    .status-offline { background-color: #EF4444; }
+    .command-bar {
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="fixed top-0 w-full z-50 bg-black bg-opacity-80 backdrop-filter backdrop-blur-lg border-b border-gray-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center py-4">
+        <div class="flex items-center">
+          <h1 class="text-2xl font-bold text-white">M7Rnetworking</h1>
+          <span class="ml-3 text-xs bg-blue-600 px-2 py-1 rounded">BETA</span>
+        </div>
+        <div class="hidden md:flex items-center space-x-6">
+          <a href="#features" class="text-gray-300 hover:text-white transition">Features</a>
+          <a href="#demo" class="text-gray-300 hover:text-white transition">Demo</a>
+          <a href="#pricing" class="text-gray-300 hover:text-white transition">Pricing</a>
+          <button onclick="openAuthModal('login')" class="text-gray-300 hover:text-white transition">Login</button>
+          <button onclick="openAuthModal('register')" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition">Get Started</button>
+        </div>
+        <div class="md:hidden">
+          <button class="text-white">
+            <i class="fas fa-bars"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="relative min-h-screen flex items-center justify-center px-6 pt-20">
+    <div class="hero-pattern absolute inset-0"></div>
+    <div class="relative max-w-6xl mx-auto text-center">
+      <div class="mb-8">
+        <span class="api-status status-online"></span>
+        <span class="text-sm text-gray-400">Backend API Online</span>
+        <span class="ml-4 text-xs text-gray-500">
+          <span id="apiStatus">Checking...</span>
+        </span>
+      </div>
+      
+      <h1 class="text-5xl md:text-7xl font-extrabold text-white mb-6">
+        Create. Sell. 
+        <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-red-500">
+          Succeed.
+        </span>
+      </h1>
+      
+      <p class="text-xl md:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto">
+        The all-in-one creator economy platform built for South African entrepreneurs. 
+        <strong>AI-powered</strong> tools, <strong>no-code</strong> store builder, and <strong>integrated payments</strong>.
+      </p>
+      
+      <div class="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4 mb-12">
+        <button onclick="openAuthModal('register')" class="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold py-4 px-8 rounded-xl text-lg transition duration-300 shadow-lg transform hover:scale-105">
+          <i class="fas fa-rocket mr-2"></i>
+          Start Building Free
+        </button>
+        <button onclick="showDemo()" class="border border-gray-600 hover:border-gray-500 text-white font-bold py-4 px-8 rounded-xl text-lg transition duration-300">
+          <i class="fas fa-play mr-2"></i>
+          Watch Demo
+        </button>
+      </div>
+      
+      <div class="text-sm text-gray-500 mb-8">
+        Join 1,000+ South African creators • No credit card required
+      </div>
+
+      <!-- Quick Stats -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-2xl mx-auto">
+        <div class="text-center">
+          <div class="text-2xl font-bold text-blue-400">500+</div>
+          <div class="text-sm text-gray-400">Stores Created</div>
+        </div>
+        <div class="text-center">
+          <div class="text-2xl font-bold text-green-400">R2.5M+</div>
+          <div class="text-sm text-gray-400">Revenue Generated</div>
+        </div>
+        <div class="text-center">
+          <div class="text-2xl font-bold text-purple-400">50K+</div>
+          <div class="text-sm text-gray-400">Products Sold</div>
+        </div>
+        <div class="text-center">
+          <div class="text-2xl font-bold text-red-400">98%</div>
+          <div class="text-sm text-gray-400">Uptime</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section id="features" class="py-20 px-6">
+    <div class="max-w-7xl mx-auto">
+      <div class="text-center mb-16">
+        <h2 class="text-4xl md:text-5xl font-bold text-white mb-4">
+          Everything You Need to Succeed
+        </h2>
+        <p class="text-xl text-gray-300 max-w-2xl mx-auto">
+          From AI-powered content creation to integrated payments, we've built the tools you need.
+        </p>
+      </div>
+
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <!-- AI Assistant -->
+        <div class="feature-card p-8 rounded-2xl">
+          <div class="text-3xl mb-4">🤖</div>
+          <h3 class="text-xl font-bold text-white mb-3">AI Sidekick</h3>
+          <p class="text-gray-300 mb-4">
+            Get instant help with product descriptions, marketing copy, and business strategy.
+          </p>
+          <button onclick="tryAI()" class="text-blue-400 hover:text-blue-300 font-medium">
+            Try AI Assistant →
+          </button>
+        </div>
+
+        <!-- Store Builder -->
+        <div class="feature-card p-8 rounded-2xl">
+          <div class="text-3xl mb-4">🏪</div>
+          <h3 class="text-xl font-bold text-white mb-3">RawShop Builder</h3>
+          <p class="text-gray-300 mb-4">
+            Create stunning online stores with our drag-and-drop no-code builder.
+          </p>
+          <button onclick="showStoreDemo()" class="text-blue-400 hover:text-blue-300 font-medium">
+            See Store Demo →
+          </button>
+        </div>
+
+        <!-- Product Builder -->
+        <div class="feature-card p-8 rounded-2xl">
+          <div class="text-3xl mb-4">👕</div>
+          <h3 class="text-xl font-bold text-white mb-3">Product Builder</h3>
+          <p class="text-gray-300 mb-4">
+            Design and sell t-shirts, digital products, courses, and more.
+          </p>
+          <button onclick="showProductDemo()" class="text-blue-400 hover:text-blue-300 font-medium">
+            Create Product →
+          </button>
+        </div>
+
+        <!-- Payments -->
+        <div class="feature-card p-8 rounded-2xl">
+          <div class="text-3xl mb-4">💳</div>
+          <h3 class="text-xl font-bold text-white mb-3">SA Payments</h3>
+          <p class="text-gray-300 mb-4">
+            PayFast integration for local payments + Stripe for international sales.
+          </p>
+          <div class="text-green-400 text-sm font-medium">
+            <i class="fas fa-check mr-1"></i>
+            PayFast Ready
+          </div>
+        </div>
+
+        <!-- Social Feed -->
+        <div class="feature-card p-8 rounded-2xl">
+          <div class="text-3xl mb-4">📱</div>
+          <h3 class="text-xl font-bold text-white mb-3">RealTalk Feed</h3>
+          <p class="text-gray-300 mb-4">
+            Connect with other creators, share your journey, build your community.
+          </p>
+          <button onclick="showSocialDemo()" class="text-blue-400 hover:text-blue-300 font-medium">
+            Join Community →
+          </button>
+        </div>
+
+        <!-- Analytics -->
+        <div class="feature-card p-8 rounded-2xl">
+          <div class="text-3xl mb-4">📊</div>
+          <h3 class="text-xl font-bold text-white mb-3">Smart Analytics</h3>
+          <p class="text-gray-300 mb-4">
+            Track sales, understand your audience, optimize your business.
+          </p>
+          <button onclick="showAnalyticsDemo()" class="text-blue-400 hover:text-blue-300 font-medium">
+            View Analytics →
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI Demo Section -->
+  <section id="demo" class="py-20 px-6 bg-black bg-opacity-50">
+    <div class="max-w-4xl mx-auto text-center">
+      <h2 class="text-4xl font-bold text-white mb-8">
+        See AI in Action
+      </h2>
+      <p class="text-gray-300 mb-8">
+        Try our AI assistant right now. Type a command and see the magic happen.
+      </p>
+      
+      <!-- Command Bar Demo -->
+      <div class="command-bar rounded-xl p-6 mb-8">
+        <div class="flex items-center mb-4">
+          <div class="w-3 h-3 bg-red-500 rounded-full mr-2"></div>
+          <div class="w-3 h-3 bg-yellow-500 rounded-full mr-2"></div>
+          <div class="w-3 h-3 bg-green-500 rounded-full mr-4"></div>
+          <span class="text-gray-400 text-sm">AI Command Bar</span>
+        </div>
+        <input 
+          type="text" 
+          id="aiInput"
+          placeholder="Try: 'Create a product description for a streetwear t-shirt'"
+          class="w-full bg-transparent text-white text-lg border-none outline-none"
+          onkeypress="handleAICommand(event)"
+        />
+      </div>
+      
+      <div id="aiResponse" class="text-left bg-gray-900 rounded-xl p-6 hidden">
+        <div class="flex items-center mb-3">
+          <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center mr-3">
+            <i class="fas fa-robot text-white text-sm"></i>
+          </div>
+          <span class="text-blue-400 font-medium">AI Assistant</span>
+        </div>
+        <div id="aiResponseText" class="text-gray-300"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing Section -->
+  <section id="pricing" class="py-20 px-6">
+    <div class="max-w-5xl mx-auto text-center">
+      <h2 class="text-4xl font-bold text-white mb-4">
+        Start Free, Scale as You Grow
+      </h2>
+      <p class="text-gray-300 mb-12">
+        Built for creators at every stage of their journey.
+      </p>
+
+      <div class="grid md:grid-cols-3 gap-8">
+        <!-- Free Plan -->
+        <div class="feature-card p-8 rounded-2xl">
+          <h3 class="text-2xl font-bold text-white mb-2">Free</h3>
+          <div class="text-4xl font-bold text-white mb-4">R0<span class="text-lg text-gray-400">/month</span></div>
+          <ul class="text-left space-y-3 mb-8">
+            <li class="flex items-center text-gray-300">
+              <i class="fas fa-check text-green-400 mr-3"></i>
+              1 Store
+            </li>
+            <li class="flex items-center text-gray-300">
+              <i class="fas fa-check text-green-400 mr-3"></i>
+              10 Products
+            </li>
+            <li class="flex items-center text-gray-300">
+              <i class="fas fa-check text-green-400 mr-3"></i>
+              Basic AI Assistant
+            </li>
+            <li class="flex items-center text-gray-300">
+              <i class="fas fa-check text-green-400 mr-3"></i>
+              PayFast Payments
+            </li>
+          </ul>
+          <button onclick="openAuthModal('register')" class="w-full bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 rounded-lg transition">
+            Get Started Free
+          </button>
+        </div>
+
+        <!-- Creator Plan -->
+        <div class="feature-card p-8 rounded-2xl border-2 border-blue-500 relative">
+          <div class="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-blue-600 text-white px-4 py-1 rounded-full text-sm">
+            Most Popular
+          </div>
+          <h3 class="text-2xl font-bold text-white mb-2">Creator</h3>
+          <div class="text-4xl font-bold text-white mb-4">R299<span class="text-lg text-gray-400">/month</span></div>
+          <ul class="text-left space-y-3 mb-8">
+            <li class="flex items-center text-gray-300">
+              <i class="fas fa-check text-green-400 mr-3"></i>
+              5 Stores
+            </li>
+            <li class="flex items-center text-gray-300">
+              <i class="fas fa-check text-green-400 mr-3"></i>
+              Unlimited Products
+            </li>
+            <li class="flex items-center text-gray-300">
+              <i class="fas fa-check text-green-400 mr-3"></i>
+              Advanced AI Tools
+            </li>
+            <li class="flex items-center text-gray-300">
+              <i class="fas fa-check text-green-400 mr-3"></i>
+              Custom Domains
+            </li>
+            <li class="flex items-center text-gray-300">
+              <i class="fas fa-check text-green-400 mr-3"></i>
+              Priority Support
+            </li>
+          </ul>
+          <button onclick="openAuthModal('register')" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition">
+            Start Creator Plan
+          </button>
+        </div>
+
+        <!-- Pro Plan -->
+        <div class="feature-card p-8 rounded-2xl">
+          <h3 class="text-2xl font-bold text-white mb-2">Pro</h3>
+          <div class="text-4xl font-bold text-white mb-4">R599<span class="text-lg text-gray-400">/month</span></div>
+          <ul class="text-left space-y-3 mb-8">
+            <li class="flex items-center text-gray-300">
+              <i class="fas fa-check text-green-400 mr-3"></i>
+              Unlimited Stores
+            </li>
+            <li class="flex items-center text-gray-300">
+              <i class="fas fa-check text-green-400 mr-3"></i>
+              White-label Solution
+            </li>
+            <li class="flex items-center text-gray-300">
+              <i class="fas fa-check text-green-400 mr-3"></i>
+              AI Content Generator
+            </li>
+            <li class="flex items-center text-gray-300">
+              <i class="fas fa-check text-green-400 mr-3"></i>
+              Advanced Analytics
+            </li>
+            <li class="flex items-center text-gray-300">
+              <i class="fas fa-check text-green-400 mr-3"></i>
+              API Access
+            </li>
+          </ul>
+          <button onclick="openAuthModal('register')" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 rounded-lg transition">
+            Go Pro
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="py-12 px-6 border-t border-gray-800">
+    <div class="max-w-6xl mx-auto">
+      <div class="grid md:grid-cols-4 gap-8">
+        <div>
+          <h3 class="text-xl font-bold text-white mb-4">M7Rnetworking</h3>
+          <p class="text-gray-400 mb-4">
+            Empowering South African creators to build, sell, and succeed online.
+          </p>
+          <div class="flex space-x-4">
+            <a href="#" class="text-gray-400 hover:text-white">
+              <i class="fab fa-twitter"></i>
+            </a>
+            <a href="#" class="text-gray-400 hover:text-white">
+              <i class="fab fa-instagram"></i>
+            </a>
+            <a href="#" class="text-gray-400 hover:text-white">
+              <i class="fab fa-linkedin"></i>
+            </a>
+          </div>
+        </div>
+        
+        <div>
+          <h4 class="font-semibold text-white mb-4">Product</h4>
+          <ul class="space-y-2">
+            <li><a href="#" class="text-gray-400 hover:text-white">Features</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-white">Pricing</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-white">API</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-white">Integrations</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h4 class="font-semibold text-white mb-4">Support</h4>
+          <ul class="space-y-2">
+            <li><a href="#" class="text-gray-400 hover:text-white">Help Center</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-white">Contact Us</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-white">Status</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-white">Community</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h4 class="font-semibold text-white mb-4">Company</h4>
+          <ul class="space-y-2">
+            <li><a href="#" class="text-gray-400 hover:text-white">About</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-white">Blog</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-white">Careers</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-white">Privacy</a></li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="border-t border-gray-800 pt-8 mt-8 text-center text-gray-400">
+        <p>&copy; 2025 M7Rnetworking. Made with ❤️ in South Africa.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Auth Modal -->
+  <div id="authModal" class="fixed inset-0 bg-black bg-opacity-50 backdrop-filter backdrop-blur-sm hidden z-50">
+    <div class="flex items-center justify-center min-h-screen p-4">
+      <div class="bg-gray-900 rounded-2xl p-8 max-w-md w-full">
+        <div class="flex justify-between items-center mb-6">
+          <h3 id="authTitle" class="text-2xl font-bold text-white">Login</h3>
+          <button onclick="closeAuthModal()" class="text-gray-400 hover:text-white">
+            <i class="fas fa-times text-xl"></i>
+          </button>
+        </div>
+        
+        <form id="authForm">
+          <div id="usernameField" class="mb-4 hidden">
+            <label class="block text-gray-300 mb-2">Username</label>
+            <input type="text" name="username" class="w-full bg-gray-800 text-white rounded-lg px-4 py-3 border border-gray-700 focus:border-blue-500 outline-none">
+          </div>
+          
+          <div class="mb-4">
+            <label class="block text-gray-300 mb-2">Email</label>
+            <input type="email" name="email" class="w-full bg-gray-800 text-white rounded-lg px-4 py-3 border border-gray-700 focus:border-blue-500 outline-none" required>
+          </div>
+          
+          <div class="mb-6">
+            <label class="block text-gray-300 mb-2">Password</label>
+            <input type="password" name="password" class="w-full bg-gray-800 text-white rounded-lg px-4 py-3 border border-gray-700 focus:border-blue-500 outline-none" required>
+          </div>
+          
+          <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition">
+            <span id="authButtonText">Login</span>
+          </button>
+        </form>
+        
+        <div class="mt-6 text-center">
+          <span class="text-gray-400">
+            <span id="authSwitchText">Don't have an account?</span>
+            <button onclick="switchAuthMode()" class="text-blue-400 hover:text-blue-300 ml-1" id="authSwitchButton">
+              Sign up
+            </button>
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
