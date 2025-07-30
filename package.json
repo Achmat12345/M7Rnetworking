@@ -8,9 +8,12 @@
     "dev": "nodemon server/index.js",
     "server": "cd server && npm run dev",
     "client": "cd client && npm start",
-    "build": "npm run build:client",
+    "build": "npm run setup",
     "build:client": "cd client && npm run build",
-    "setup": "npm install && cd server && npm install"
+    "setup": "npm install && cd server && npm install",
+    "deploy:railway": "railway deploy",
+    "deploy:vercel": "vercel --prod",
+    "production": "NODE_ENV=production node server/index.js"
   },
   "keywords": [
     "creator-economy",

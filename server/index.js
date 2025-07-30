@@ -1,4 +1,3 @@
-
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
@@ -12,26 +11,32 @@ const app = express();
 const port = process.env.PORT || 5000;
 
 // Database connection
-mongoose.connect(process.env.MONGO_URI)
-.then(() => console.log('✅ MongoDB connected successfully'))
-.catch(err => console.error('❌ MongoDB connection error:', err));
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then(() => console.log('✅ MongoDB connected successfully'))
+  .catch((err) => console.error('❌ MongoDB connection error:', err));
 
 // Middleware
-app.use(cors({
-  origin: [
-    'http://localhost:3000',
-    'http://localhost:3001',
-    process.env.FRONTEND_URL,
-    'file://'
-  ],
-  credentials: true
-}));
+app.use(
+  cors({
+    origin: [
+      'http://localhost:3000',
+      'http://localhost:3001',
+      process.env.FRONTEND_URL,
+      'file://',
+    ],
+    credentials: true,
+  })
+);
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Static files
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// Serve client static files
+app.use(express.static(path.join(__dirname, '..', 'client')));
 
 // Basic route
 app.get('/', (req, res) => {
@@ -45,7 +50,7 @@ app.get('/', (req, res) => {
       'Store Builder',
       'AI Assistant',
       'Payment Processing',
-      'Affiliate Program'
+      'Affiliate Program',
     ],
     endpoints: {
       auth: '/api/auth',
@@ -55,9 +60,10 @@ app.get('/', (req, res) => {
       orders: '/api/orders',
       ai: '/api/ai',
       affiliates: '/api/affiliates',
-      payments: '/api/payments'
+      payments: '/api/payments',
     },
-    database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
+    database:
+      mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
   });
 });
 
@@ -129,15 +135,18 @@ try {
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error('Global error handler:', err.stack);
-  res.status(500).json({ 
-    message: 'Something went wrong!', 
-    error: process.env.NODE_ENV === 'development' ? err.message : 'Internal server error'
+  res.status(500).json({
+    message: 'Something went wrong!',
+    error:
+      process.env.NODE_ENV === 'development'
+        ? err.message
+        : 'Internal server error',
   });
 });
 
 // 404 handler
 app.use((req, res) => {
-  res.status(404).json({ 
+  res.status(404).json({
     message: 'Route not found',
     path: req.path,
     method: req.method,
@@ -148,8 +157,8 @@ app.use((req, res) => {
       'GET /api/auth/me',
       'GET /api/products',
       'GET /api/stores',
-      'POST /api/ai/generate-product-description'
-    ]
+      'POST /api/ai/generate-product-description',
+    ],
   });
 });
 
@@ -158,6 +167,11 @@ app.listen(port, () => {
   console.log(`📡 Server running on port ${port}`);
   console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
   console.log(`🔗 API Documentation: http://localhost:${port}`);
-  console.log(`🗄️ Database: ${process.env.MONGO_URI ? 'MongoDB Atlas' : 'Not configured'}`);
+  console.log(
+    `🗄️ Database: ${process.env.MONGO_URI ? 'MongoDB Atlas' : 'Not configured'}`
+  );
   console.log('📝 Routes loaded successfully');
 });
+
+// Export app for testing
+module.exports = app;

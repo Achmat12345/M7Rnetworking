@@ -5,94 +5,96 @@ const storeSchema = new mongoose.Schema({
     type: String,
     required: true,
     trim: true,
-    maxlength: 100
+    maxlength: 100,
   },
   slug: {
     type: String,
     required: true,
     unique: true,
     lowercase: true,
-    trim: true
+    trim: true,
   },
   description: {
     type: String,
-    maxlength: 500
+    maxlength: 500,
   },
   logo: String,
   banner: String,
   theme: {
     primaryColor: {
       type: String,
-      default: '#3B82F6'
+      default: '#3B82F6',
     },
     secondaryColor: {
       type: String,
-      default: '#1F2937'
+      default: '#1F2937',
     },
     fontFamily: {
       type: String,
-      default: 'Inter'
+      default: 'Inter',
     },
     template: {
       type: String,
       default: 'modern',
-      enum: ['modern', 'minimal', 'classic', 'bold', 'creative']
-    }
+      enum: ['modern', 'minimal', 'classic', 'bold', 'creative'],
+    },
   },
   settings: {
     isPublic: {
       type: Boolean,
-      default: true
+      default: true,
     },
     allowGuestCheckout: {
       type: Boolean,
-      default: true
+      default: true,
     },
     currency: {
       type: String,
       default: 'ZAR',
-      enum: ['ZAR', 'USD', 'EUR', 'GBP']
+      enum: ['ZAR', 'USD', 'EUR', 'GBP'],
     },
     paymentMethods: {
       payfast: {
         enabled: {
           type: Boolean,
-          default: true
+          default: true,
         },
         merchantId: String,
-        merchantKey: String
+        merchantKey: String,
       },
       stripe: {
         enabled: {
           type: Boolean,
-          default: false
+          default: false,
         },
-        publishableKey: String
-      }
+        publishableKey: String,
+      },
     },
     shipping: {
       enabled: {
         type: Boolean,
-        default: true
+        default: true,
       },
       freeShippingThreshold: Number,
-      rates: [{
-        name: String,
-        price: Number,
-        description: String
-      }]
+      rates: [
+        {
+          name: String,
+          price: Number,
+          description: String,
+        },
+      ],
     },
     taxes: {
       enabled: {
         type: Boolean,
-        default: false
+        default: false,
       },
       rate: Number,
       includeInPrice: {
         type: Boolean,
-        default: true
-      }
-    }
+        default: true,
+      },
+    },
   },
   contact: {
     email: String,
@@ -104,99 +106,103 @@ const storeSchema = new mongoose.Schema({
       postalCode: String,
       country: {
         type: String,
-        default: 'South Africa'
-      }
-    }
+        default: 'South Africa',
+      },
+    },
   },
   social: {
     facebook: String,
     instagram: String,
     twitter: String,
-    youtube: String
+    youtube: String,
   },
   // No-code builder data
-  pages: [{
-    name: String,
-    slug: String,
-    content: mongoose.Schema.Types.Mixed, // GrapesJS content
-    isHomePage: {
-      type: Boolean,
-      default: false
+  pages: [
+    {
+      name: String,
+      slug: String,
+      content: mongoose.Schema.Types.Mixed, // GrapesJS content
+      isHomePage: {
+        type: Boolean,
+        default: false,
+      },
+      isPublished: {
+        type: Boolean,
+        default: false,
+      },
     },
-    isPublished: {
-      type: Boolean,
-      default: false
-    }
-  }],
+  ],
   customDomain: {
     domain: String,
     isConnected: {
       type: Boolean,
-      default: false
+      default: false,
     },
     sslEnabled: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
   // Analytics
   analytics: {
     visitors: {
       type: Number,
-      default: 0
+      default: 0,
     },
     pageViews: {
       type: Number,
-      default: 0
+      default: 0,
     },
     orders: {
       type: Number,
-      default: 0
+      default: 0,
     },
     revenue: {
       type: Number,
-      default: 0
-    }
+      default: 0,
+    },
   },
   // SEO
   seo: {
     title: String,
     description: String,
     keywords: [String],
-    favicon: String
+    favicon: String,
   },
   // Relationships
   owner: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: true
+    required: true,
   },
-  products: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Product'
-  }],
+  products: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Product',
+    },
+  ],
   isActive: {
     type: Boolean,
-    default: true
+    default: true,
   },
   createdAt: {
     type: Date,
-    default: Date.now
+    default: Date.now,
   },
   updatedAt: {
     type: Date,
-    default: Date.now
-  }
+    default: Date.now,
+  },
 });
 
 // Update updatedAt field
-storeSchema.pre('save', function(next) {
+storeSchema.pre('save', function (next) {
   this.updatedAt = Date.now();
   next();
 });
 
 // Generate slug from name
-storeSchema.pre('save', function(next) {
+storeSchema.pre('save', function (next) {
   if (this.isModified('name') && !this.slug) {
     this.slug = this.name
       .toLowerCase()

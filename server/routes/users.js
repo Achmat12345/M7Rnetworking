@@ -12,7 +12,7 @@ router.get('/profile', auth, async (req, res) => {
     const user = await User.findById(req.user.id)
       .populate('stores', 'name slug theme.template analytics')
       .select('-password');
-    
+
     res.json({ user });
   } catch (error) {
     console.error('Get profile error:', error);
@@ -27,11 +27,11 @@ router.put('/profile', auth, async (req, res) => {
   try {
     const {
       profile: { firstName, lastName, bio, website, social },
-      settings
+      settings,
     } = req.body;
 
     const user = await User.findById(req.user.id);
-    
+
     // Update profile
     if (firstName !== undefined) user.profile.firstName = firstName;
     if (lastName !== undefined) user.profile.lastName = lastName;
@@ -48,9 +48,9 @@ router.put('/profile', auth, async (req, res) => {
 
     await user.save();
 
-    res.json({ 
+    res.json({
       message: 'Profile updated successfully',
-      user 
+      user,
     });
   } catch (error) {
     console.error('Update profile error:', error);
@@ -63,24 +63,32 @@ router.put('/profile', auth, async (req, res) => {
 // @access  Private
 router.get('/dashboard', auth, async (req, res) => {
   try {
-    const user = await User.findById(req.user.id)
-      .populate({
-        path: 'stores',
-        select: 'name analytics products',
-        populate: {
-          path: 'products',
-          select: 'name sales revenue'
-        }
-      });
+    const user = await User.findById(req.user.id).populate({
+      path: 'stores',
+      select: 'name analytics products',
+      populate: {
+        path: 'products',
+        select: 'name sales revenue',
+      },
+    });
 
     // Calculate dashboard metrics
     const metrics = {
       totalStores: user.stores.length,
-      totalProducts: user.stores.reduce((total, store) => total + store.products.length, 0),
-      totalRevenue: user.stores.reduce((total, store) => total + store.analytics.revenue, 0),
-      totalOrders: user.stores.reduce((total, store) => total + store.analytics.orders, 0),
+      totalProducts: user.stores.reduce(
+        (total, store) => total + store.products.length,
+        0
+      ),
+      totalRevenue: user.stores.reduce(
+        (total, store) => total + store.analytics.revenue,
+        0
+      ),
+      totalOrders: user.stores.reduce(
+        (total, store) => total + store.analytics.orders,
+        0
+      ),
       affiliateEarnings: user.affiliate.totalEarnings,
-      referralCount: user.affiliate.referrals.length
+      referralCount: user.affiliate.referrals.length,
     };
 
     res.json({
@@ -89,11 +97,11 @@ router.get('/dashboard', auth, async (req, res) => {
         username: user.username,
         email: user.email,
         subscription: user.subscription,
-        profile: user.profile
+        profile: user.profile,
       },
       metrics,
       stores: user.stores,
-      recentActivity: [] // TODO: Implement activity tracking
+      recentActivity: [], // TODO: Implement activity tracking
     });
   } catch (error) {
     console.error('Get dashboard error:', error);
@@ -106,8 +114,10 @@ router.get('/dashboard', auth, async (req, res) => {
 // @access  Private
 router.get('/affiliate', auth, async (req, res) => {
   try {
-    const user = await User.findById(req.user.id)
-      .populate('affiliate.referrals.user', 'username email createdAt');
+    const user = await User.findById(req.user.id).populate(
+      'affiliate.referrals.user',
+      'username email createdAt'
+    );
 
     if (!user.affiliate.isAffiliate) {
       // Enable affiliate program for user
@@ -124,8 +134,8 @@ router.get('/affiliate', auth, async (req, res) => {
         totalEarnings: user.affiliate.totalEarnings,
         pendingPayouts: user.affiliate.pendingPayouts,
         referrals: user.affiliate.referrals,
-        referralLink: `${process.env.FRONTEND_URL}/register?ref=${user.affiliate.referralCode}`
-      }
+        referralLink: `${process.env.FRONTEND_URL}/register?ref=${user.affiliate.referralCode}`,
+      },
     });
   } catch (error) {
     console.error('Get affiliate data error:', error);
@@ -147,7 +157,7 @@ router.put('/subscription', auth, async (req, res) => {
     const user = await User.findById(req.user.id);
     user.subscription.plan = plan;
     user.subscription.startDate = new Date();
-    
+
     // Set end date based on plan (monthly for now)
     if (plan !== 'free') {
       const endDate = new Date();
@@ -157,9 +167,9 @@ router.put('/subscription', auth, async (req, res) => {
 
     await user.save();
 
-    res.json({ 
+    res.json({
       message: 'Subscription updated successfully',
-      subscription: user.subscription 
+      subscription: user.subscription,
     });
   } catch (error) {
     console.error('Update subscription error:', error);
@@ -175,7 +185,7 @@ router.delete('/account', auth, async (req, res) => {
     const { password } = req.body;
 
     const user = await User.findById(req.user.id).select('+password');
-    
+
     // Verify password
     const isValidPassword = await user.comparePassword(password);
     if (!isValidPassword) {

@@ -20,25 +20,25 @@ router.post('/register', async (req, res) => {
 
     // Validation
     if (!username || !email || !password) {
-      return res.status(400).json({ 
-        message: 'Please provide username, email, and password' 
+      return res.status(400).json({
+        message: 'Please provide username, email, and password',
       });
     }
 
     if (password.length < 6) {
-      return res.status(400).json({ 
-        message: 'Password must be at least 6 characters long' 
+      return res.status(400).json({
+        message: 'Password must be at least 6 characters long',
       });
     }
 
     // Check if user exists
     const existingUser = await User.findOne({
-      $or: [{ email }, { username }]
+      $or: [{ email }, { username }],
     });
 
     if (existingUser) {
-      return res.status(400).json({ 
-        message: 'User with this email or username already exists' 
+      return res.status(400).json({
+        message: 'User with this email or username already exists',
       });
     }
 
@@ -53,7 +53,7 @@ router.post('/register', async (req, res) => {
       username,
       email,
       password,
-      ...(referrer && { 'affiliate.referredBy': referrer._id })
+      ...(referrer && { 'affiliate.referredBy': referrer._id }),
     });
 
     await user.save();
@@ -66,7 +66,7 @@ router.post('/register', async (req, res) => {
     if (referrer) {
       referrer.affiliate.referrals.push({
         user: user._id,
-        dateReferred: new Date()
+        dateReferred: new Date(),
       });
       await referrer.save();
     }
@@ -81,8 +81,8 @@ router.post('/register', async (req, res) => {
         id: user._id,
         username: user.username,
         email: user.email,
-        referralCode: user.affiliate.referralCode
-      }
+        referralCode: user.affiliate.referralCode,
+      },
     });
   } catch (error) {
     console.error('Registration error:', error);
@@ -99,8 +99,8 @@ router.post('/login', async (req, res) => {
 
     // Validation
     if (!email || !password) {
-      return res.status(400).json({ 
-        message: 'Please provide email and password' 
+      return res.status(400).json({
+        message: 'Please provide email and password',
       });
     }
 
@@ -131,8 +131,8 @@ router.post('/login', async (req, res) => {
         username: user.username,
         email: user.email,
         subscription: user.subscription,
-        stores: user.stores
-      }
+        stores: user.stores,
+      },
     });
   } catch (error) {
     console.error('Login error:', error);
@@ -148,7 +148,7 @@ router.get('/me', auth, async (req, res) => {
     const user = await User.findById(req.user.id)
       .populate('stores', 'name slug')
       .select('-password');
-    
+
     res.json({ user });
   } catch (error) {
     console.error('Get user error:', error);
@@ -189,9 +189,10 @@ router.post('/forgot-password', async (req, res) => {
 
     // TODO: Send email with reset link
     // For now, return the token (in production, never do this!)
-    res.json({ 
+    res.json({
       message: 'Password reset token generated',
-      resetToken: process.env.NODE_ENV === 'development' ? resetToken : undefined
+      resetToken:
+        process.env.NODE_ENV === 'development' ? resetToken : undefined,
     });
   } catch (error) {
     console.error('Forgot password error:', error);
@@ -207,24 +208,26 @@ router.post('/reset-password', async (req, res) => {
     const { token, password } = req.body;
 
     if (!token || !password) {
-      return res.status(400).json({ 
-        message: 'Please provide token and new password' 
+      return res.status(400).json({
+        message: 'Please provide token and new password',
       });
     }
 
     if (password.length < 6) {
-      return res.status(400).json({ 
-        message: 'Password must be at least 6 characters long' 
+      return res.status(400).json({
+        message: 'Password must be at least 6 characters long',
       });
     }
 
     const user = await User.findOne({
       passwordResetToken: token,
-      passwordResetExpires: { $gt: Date.now() }
+      passwordResetExpires: { $gt: Date.now() },
     });
 
     if (!user) {
-      return res.status(400).json({ message: 'Invalid or expired reset token' });
+      return res
+        .status(400)
+        .json({ message: 'Invalid or expired reset token' });
     }
 
     // Update password
@@ -248,13 +251,13 @@ router.post('/change-password', auth, async (req, res) => {
     const { currentPassword, newPassword } = req.body;
 
     if (!currentPassword || !newPassword) {
-      return res.status(400).json({ 
-        message: 'Please provide current and new password' 
+      return res.status(400).json({
+        message: 'Please provide current and new password',
       });
     }
 
     const user = await User.findById(req.user.id).select('+password');
-    
+
     // Verify current password
     const isValidPassword = await user.comparePassword(currentPassword);
     if (!isValidPassword) {
@@ -262,8 +265,8 @@ router.post('/change-password', auth, async (req, res) => {
     }
 
     if (newPassword.length < 6) {
-      return res.status(400).json({ 
-        message: 'New password must be at least 6 characters long' 
+      return res.status(400).json({
+        message: 'New password must be at least 6 characters long',
       });
     }
 

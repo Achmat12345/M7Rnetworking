@@ -10,19 +10,19 @@ const router = express.Router();
 // @access  Public
 router.get('/', async (req, res) => {
   try {
-    const { 
-      category, 
-      type, 
-      store, 
-      search, 
-      page = 1, 
+    const {
+      category,
+      type,
+      store,
+      search,
+      page = 1,
       limit = 20,
       sortBy = 'createdAt',
-      sortOrder = 'desc'
+      sortOrder = 'desc',
     } = req.query;
 
     const filter = { isActive: true };
-    
+
     if (category) filter.category = category;
     if (type) filter.type = type;
     if (store) filter.store = store;
@@ -47,7 +47,7 @@ router.get('/', async (req, res) => {
       products,
       totalPages: Math.ceil(total / limit),
       currentPage: page,
-      total
+      total,
     });
   } catch (error) {
     console.error('Get products error:', error);
@@ -97,13 +97,13 @@ router.post('/', auth, async (req, res) => {
       digitalDetails,
       seo,
       tags,
-      storeId
+      storeId,
     } = req.body;
 
     // Validate required fields
     if (!name || !description || !category || !type || !price || !storeId) {
-      return res.status(400).json({ 
-        message: 'Please provide all required fields' 
+      return res.status(400).json({
+        message: 'Please provide all required fields',
       });
     }
 
@@ -114,7 +114,9 @@ router.post('/', auth, async (req, res) => {
     }
 
     if (store.owner.toString() !== req.user.id) {
-      return res.status(403).json({ message: 'Not authorized to add products to this store' });
+      return res
+        .status(403)
+        .json({ message: 'Not authorized to add products to this store' });
     }
 
     // Create product
@@ -132,7 +134,7 @@ router.post('/', auth, async (req, res) => {
       seo: seo || {},
       tags: tags || [],
       store: storeId,
-      creator: req.user.id
+      creator: req.user.id,
     });
 
     await product.save();
@@ -146,7 +148,7 @@ router.post('/', auth, async (req, res) => {
 
     res.status(201).json({
       message: 'Product created successfully',
-      product
+      product,
     });
   } catch (error) {
     console.error('Create product error:', error);
@@ -167,16 +169,27 @@ router.put('/:id', auth, async (req, res) => {
 
     // Check ownership
     if (product.creator.toString() !== req.user.id) {
-      return res.status(403).json({ message: 'Not authorized to update this product' });
+      return res
+        .status(403)
+        .json({ message: 'Not authorized to update this product' });
     }
 
     const updateFields = [
-      'name', 'description', 'price', 'images', 'inventory', 
-      'variants', 'tshirtDetails', 'digitalDetails', 'seo', 
-      'tags', 'isActive', 'isFeatured'
+      'name',
+      'description',
+      'price',
+      'images',
+      'inventory',
+      'variants',
+      'tshirtDetails',
+      'digitalDetails',
+      'seo',
+      'tags',
+      'isActive',
+      'isFeatured',
     ];
 
-    updateFields.forEach(field => {
+    updateFields.forEach((field) => {
       if (req.body[field] !== undefined) {
         product[field] = req.body[field];
       }
@@ -187,7 +200,7 @@ router.put('/:id', auth, async (req, res) => {
 
     res.json({
       message: 'Product updated successfully',
-      product
+      product,
     });
   } catch (error) {
     console.error('Update product error:', error);
@@ -208,14 +221,15 @@ router.delete('/:id', auth, async (req, res) => {
 
     // Check ownership
     if (product.creator.toString() !== req.user.id) {
-      return res.status(403).json({ message: 'Not authorized to delete this product' });
+      return res
+        .status(403)
+        .json({ message: 'Not authorized to delete this product' });
     }
 
     // Remove from store
-    await Store.findByIdAndUpdate(
-      product.store,
-      { $pull: { products: product._id } }
-    );
+    await Store.findByIdAndUpdate(product.store, {
+      $pull: { products: product._id },
+    });
 
     await Product.findByIdAndDelete(req.params.id);
 
@@ -233,25 +247,25 @@ router.get('/store/:storeId', async (req, res) => {
   try {
     const { page = 1, limit = 20 } = req.query;
 
-    const products = await Product.find({ 
-      store: req.params.storeId, 
-      isActive: true 
+    const products = await Product.find({
+      store: req.params.storeId,
+      isActive: true,
     })
       .populate('creator', 'username')
       .sort({ createdAt: -1 })
       .limit(limit * 1)
       .skip((page - 1) * limit);
 
-    const total = await Product.countDocuments({ 
-      store: req.params.storeId, 
-      isActive: true 
+    const total = await Product.countDocuments({
+      store: req.params.storeId,
+      isActive: true,
     });
 
     res.json({
       products,
       totalPages: Math.ceil(total / limit),
       currentPage: page,
-      total
+      total,
     });
   } catch (error) {
     console.error('Get store products error:', error);
@@ -281,7 +295,7 @@ router.get('/user/my-products', auth, async (req, res) => {
       products,
       totalPages: Math.ceil(total / limit),
       currentPage: page,
-      total
+      total,
     });
   } catch (error) {
     console.error('Get user products error:', error);
@@ -301,7 +315,7 @@ router.get('/meta/categories', async (req, res) => {
       { value: 'template', label: 'Templates', icon: '📄' },
       { value: 'digital', label: 'Digital Products', icon: '💾' },
       { value: 'physical', label: 'Physical Products', icon: '📦' },
-      { value: 'service', label: 'Services', icon: '🛠️' }
+      { value: 'service', label: 'Services', icon: '🛠️' },
     ];
 
     res.json({ categories });

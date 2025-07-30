@@ -16,7 +16,7 @@ const payfastConfig = {
   sandbox: process.env.PAYFAST_SANDBOX === 'true',
   returnUrl: `${process.env.FRONTEND_URL}/payment/success`,
   cancelUrl: `${process.env.FRONTEND_URL}/payment/cancel`,
-  notifyUrl: `${process.env.BACKEND_URL || 'http://localhost:5000'}/api/payments/payfast/notify`
+  notifyUrl: `${process.env.BACKEND_URL || 'http://localhost:5000'}/api/payments/payfast/notify`,
 };
 
 // Generate PayFast signature
@@ -24,20 +24,20 @@ const generatePayFastSignature = (data, passphrase = '') => {
   // Create parameter string
   let paramString = '';
   const sortedKeys = Object.keys(data).sort();
-  
-  sortedKeys.forEach(key => {
+
+  sortedKeys.forEach((key) => {
     if (data[key] !== '') {
       paramString += `${key}=${encodeURIComponent(data[key].toString().trim())}&`;
     }
   });
-  
+
   // Remove last ampersand
   paramString = paramString.slice(0, -1);
-  
+
   if (passphrase) {
     paramString += `&passphrase=${encodeURIComponent(passphrase.trim())}`;
   }
-  
+
   return crypto.createHash('md5').update(paramString).digest('hex');
 };
 
@@ -53,13 +53,13 @@ router.post('/create-order', optionalAuth, async (req, res) => {
       billing,
       paymentMethod,
       storeId,
-      referralCode
+      referralCode,
     } = req.body;
 
     // Validate required fields
     if (!items || !items.length || !customer || !storeId) {
-      return res.status(400).json({ 
-        message: 'Missing required fields' 
+      return res.status(400).json({
+        message: 'Missing required fields',
       });
     }
 
@@ -76,8 +76,8 @@ router.post('/create-order', optionalAuth, async (req, res) => {
     for (const item of items) {
       const product = await Product.findById(item.productId);
       if (!product || !product.isActive) {
-        return res.status(400).json({ 
-          message: `Product ${item.productId} not found or inactive` 
+        return res.status(400).json({
+          message: `Product ${item.productId} not found or inactive`,
         });
       }
 
@@ -90,31 +90,37 @@ router.post('/create-order', optionalAuth, async (req, res) => {
         price: product.price.amount,
         quantity: item.quantity,
         variant: item.variant || {},
-        subtotal: itemTotal
+        subtotal: itemTotal,
       });
     }
 
     // Calculate shipping and tax
-    const shippingCost = store.settings.shipping?.enabled ? 
-      (store.settings.shipping.rates?.[0]?.price || 0) : 0;
-    
-    const taxRate = store.settings.taxes?.enabled ? 
-      (store.settings.taxes.rate || 0) : 0;
-    const taxAmount = store.settings.taxes?.includeInPrice ? 0 : subtotal * (taxRate / 100);
-    
+    const shippingCost = store.settings.shipping?.enabled
+      ? store.settings.shipping.rates?.[0]?.price || 0
+      : 0;
+
+    const taxRate = store.settings.taxes?.enabled
+      ? store.settings.taxes.rate || 0
+      : 0;
+    const taxAmount = store.settings.taxes?.includeInPrice
+      ? 0
+      : subtotal * (taxRate / 100);
+
     const total = subtotal + shippingCost + taxAmount;
 
     // Handle affiliate referral
     let affiliate = null;
     if (referralCode) {
-      const referrer = await User.findOne({ 'affiliate.referralCode': referralCode });
+      const referrer = await User.findOne({
+        'affiliate.referralCode': referralCode,
+      });
       if (referrer) {
         affiliate = {
           referrer: referrer._id,
           commission: {
             rate: 0.05, // 5% commission
-            amount: total * 0.05
-          }
+            amount: total * 0.05,
+          },
         };
       }
     }
@@ -126,7 +132,7 @@ router.post('/create-order', optionalAuth, async (req, res) => {
         email: customer.email,
         firstName: customer.firstName,
         lastName: customer.lastName,
-        phone: customer.phone
+        phone: customer.phone,
       },
       items: orderItems,
       pricing: {
@@ -134,15 +140,15 @@ router.post('/create-order', optionalAuth, async (req, res) => {
         shipping: shippingCost,
         tax: taxAmount,
         total,
-        currency: store.settings.currency || 'ZAR'
+        currency: store.settings.currency || 'ZAR',
       },
       shipping,
       billing: billing || shipping,
       payment: {
-        method: paymentMethod
+        method: paymentMethod,
       },
       store: storeId,
-      affiliate
+      affiliate,
     });
 
     await order.save();
@@ -166,25 +172,27 @@ router.post('/create-order', optionalAuth, async (req, res) => {
         item_name: `Order ${order.orderNumber}`,
         item_description: `Order from ${store.name}`,
         custom_str1: order._id.toString(),
-        custom_str2: storeId
+        custom_str2: storeId,
       };
 
-      const signature = generatePayFastSignature(payfastData, payfastConfig.passphrase);
+      const signature = generatePayFastSignature(
+        payfastData,
+        payfastConfig.passphrase
+      );
       payfastData.signature = signature;
 
       paymentData = {
-        url: payfastConfig.sandbox ? 
-          'https://sandbox.payfast.co.za/eng/process' : 
-          'https://www.payfast.co.za/eng/process',
-        data: payfastData
+        url: payfastConfig.sandbox
+          ? 'https://sandbox.payfast.co.za/eng/process'
+          : 'https://www.payfast.co.za/eng/process',
+        data: payfastData,
       };
-
     } else if (paymentMethod === 'stripe') {
       // Create Stripe payment intent
       // TODO: Implement Stripe integration
       paymentData = {
         clientSecret: 'stripe_payment_intent_client_secret',
-        message: 'Stripe integration coming soon'
+        message: 'Stripe integration coming soon',
       };
     }
 
@@ -194,11 +202,10 @@ router.post('/create-order', optionalAuth, async (req, res) => {
         id: order._id,
         orderNumber: order.orderNumber,
         total: order.pricing.total,
-        currency: order.pricing.currency
+        currency: order.pricing.currency,
       },
-      payment: paymentData
+      payment: paymentData,
     });
-
   } catch (error) {
     console.error('Create order error:', error);
     res.status(500).json({ message: 'Server error' });
@@ -211,11 +218,14 @@ router.post('/create-order', optionalAuth, async (req, res) => {
 router.post('/payfast/notify', async (req, res) => {
   try {
     const data = req.body;
-    
+
     // Verify signature
     const { signature, ...dataWithoutSignature } = data;
-    const calculatedSignature = generatePayFastSignature(dataWithoutSignature, payfastConfig.passphrase);
-    
+    const calculatedSignature = generatePayFastSignature(
+      dataWithoutSignature,
+      payfastConfig.passphrase
+    );
+
     if (signature !== calculatedSignature) {
       console.error('PayFast signature verification failed');
       return res.status(400).send('Invalid signature');
@@ -239,10 +249,10 @@ router.post('/payfast/notify', async (req, res) => {
       // Update product sales
       for (const item of order.items) {
         await Product.findByIdAndUpdate(item.product, {
-          $inc: { 
+          $inc: {
             sales: item.quantity,
-            revenue: item.subtotal
-          }
+            revenue: item.subtotal,
+          },
         });
       }
 
@@ -250,8 +260,8 @@ router.post('/payfast/notify', async (req, res) => {
       await Store.findByIdAndUpdate(order.store, {
         $inc: {
           'analytics.orders': 1,
-          'analytics.revenue': order.pricing.total
-        }
+          'analytics.revenue': order.pricing.total,
+        },
       });
 
       // Handle affiliate commission
@@ -259,11 +269,10 @@ router.post('/payfast/notify', async (req, res) => {
         await User.findByIdAndUpdate(order.affiliate.referrer, {
           $inc: {
             'affiliate.totalEarnings': order.affiliate.commission.amount,
-            'affiliate.pendingPayouts': order.affiliate.commission.amount
-          }
+            'affiliate.pendingPayouts': order.affiliate.commission.amount,
+          },
         });
       }
-
     } else {
       order.payment.status = 'failed';
       order.status = 'cancelled';
@@ -272,7 +281,6 @@ router.post('/payfast/notify', async (req, res) => {
     await order.save();
 
     res.status(200).send('OK');
-
   } catch (error) {
     console.error('PayFast notify error:', error);
     res.status(500).send('Server error');
@@ -319,7 +327,7 @@ router.get('/orders', auth, async (req, res) => {
       orders,
       totalPages: Math.ceil(total / limit),
       currentPage: page,
-      total
+      total,
     });
   } catch (error) {
     console.error('Get orders error:', error);
@@ -355,7 +363,7 @@ router.get('/store/:storeId/orders', auth, async (req, res) => {
       orders,
       totalPages: Math.ceil(total / limit),
       currentPage: page,
-      total
+      total,
     });
   } catch (error) {
     console.error('Get store orders error:', error);
@@ -370,8 +378,10 @@ router.put('/order/:orderId/status', auth, async (req, res) => {
   try {
     const { status, trackingNumber } = req.body;
 
-    const order = await Order.findById(req.params.orderId)
-      .populate('store', 'owner');
+    const order = await Order.findById(req.params.orderId).populate(
+      'store',
+      'owner'
+    );
 
     if (!order) {
       return res.status(404).json({ message: 'Order not found' });
@@ -382,7 +392,13 @@ router.put('/order/:orderId/status', auth, async (req, res) => {
       return res.status(403).json({ message: 'Not authorized' });
     }
 
-    const validStatuses = ['pending', 'processing', 'shipped', 'delivered', 'cancelled'];
+    const validStatuses = [
+      'pending',
+      'processing',
+      'shipped',
+      'delivered',
+      'cancelled',
+    ];
     if (!validStatuses.includes(status)) {
       return res.status(400).json({ message: 'Invalid status' });
     }
@@ -396,7 +412,7 @@ router.put('/order/:orderId/status', auth, async (req, res) => {
 
     res.json({
       message: 'Order status updated successfully',
-      order
+      order,
     });
   } catch (error) {
     console.error('Update order status error:', error);

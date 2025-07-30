@@ -1,5 +1,8 @@
 // M7Rnetworking Frontend JavaScript
-const API_BASE_URL = 'http://localhost:5000/api';
+// Auto-detect API base URL - use current host if served from server, otherwise localhost
+const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+    ? 'http://localhost:5000/api' 
+    : `${window.location.protocol}//${window.location.host}/api`;
 
 // Global state
 let currentUser = null;

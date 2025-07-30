@@ -4,69 +4,78 @@ const orderSchema = new mongoose.Schema({
   orderNumber: {
     type: String,
     required: true,
-    unique: true
+    unique: true,
   },
   status: {
     type: String,
-    enum: ['pending', 'processing', 'shipped', 'delivered', 'cancelled', 'refunded'],
-    default: 'pending'
+    enum: [
+      'pending',
+      'processing',
+      'shipped',
+      'delivered',
+      'cancelled',
+      'refunded',
+    ],
+    default: 'pending',
   },
   customer: {
     user: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'User'
+      ref: 'User',
     },
     // Guest checkout info
     email: String,
     firstName: String,
     lastName: String,
-    phone: String
+    phone: String,
   },
-  items: [{
-    product: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Product',
-      required: true
+  items: [
+    {
+      product: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Product',
+        required: true,
+      },
+      name: String,
+      price: Number,
+      quantity: {
+        type: Number,
+        required: true,
+        min: 1,
+      },
+      variant: {
+        size: String,
+        color: String,
+        other: mongoose.Schema.Types.Mixed,
+      },
+      subtotal: Number,
     },
-    name: String,
-    price: Number,
-    quantity: {
-      type: Number,
-      required: true,
-      min: 1
-    },
-    variant: {
-      size: String,
-      color: String,
-      other: mongoose.Schema.Types.Mixed
-    },
-    subtotal: Number
-  }],
+  ],
   pricing: {
     subtotal: {
       type: Number,
-      required: true
+      required: true,
     },
     shipping: {
       type: Number,
-      default: 0
+      default: 0,
     },
     tax: {
       type: Number,
-      default: 0
+      default: 0,
     },
     discount: {
       type: Number,
-      default: 0
+      default: 0,
     },
     total: {
       type: Number,
-      required: true
+      required: true,
     },
     currency: {
       type: String,
-      default: 'ZAR'
-    }
+      default: 'ZAR',
+    },
   },
   shipping: {
     address: {
@@ -77,11 +86,11 @@ const orderSchema = new mongoose.Schema({
       city: String,
       province: String,
       postalCode: String,
-      country: String
+      country: String,
     },
     method: String,
     trackingNumber: String,
-    estimatedDelivery: Date
+    estimatedDelivery: Date,
   },
   billing: {
     address: {
@@ -92,65 +101,65 @@ const orderSchema = new mongoose.Schema({
       city: String,
       province: String,
       postalCode: String,
-      country: String
+      country: String,
     },
     sameAsShipping: {
       type: Boolean,
-      default: true
-    }
+      default: true,
+    },
   },
   payment: {
     method: {
       type: String,
       enum: ['payfast', 'stripe', 'manual'],
-      required: true
+      required: true,
     },
     status: {
       type: String,
       enum: ['pending', 'processing', 'completed', 'failed', 'cancelled'],
-      default: 'pending'
+      default: 'pending',
     },
     transactionId: String,
     payfastPaymentId: String,
     stripePaymentIntentId: String,
     paidAt: Date,
     refundedAt: Date,
-    refundAmount: Number
+    refundAmount: Number,
   },
   store: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Store',
-    required: true
+    required: true,
   },
   notes: String,
   // Affiliate tracking
   affiliate: {
     referrer: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'User'
+      ref: 'User',
     },
     commission: {
       rate: Number,
       amount: Number,
       paid: {
         type: Boolean,
-        default: false
+        default: false,
       },
-      paidAt: Date
-    }
+      paidAt: Date,
+    },
   },
   createdAt: {
     type: Date,
-    default: Date.now
+    default: Date.now,
   },
   updatedAt: {
     type: Date,
-    default: Date.now
-  }
+    default: Date.now,
+  },
 });
 
 // Generate order number
-orderSchema.pre('save', function(next) {
+orderSchema.pre('save', function (next) {
   if (!this.orderNumber) {
     const timestamp = Date.now().toString();
     const random = Math.random().toString(36).substr(2, 4).toUpperCase();
@@ -161,19 +170,20 @@ orderSchema.pre('save', function(next) {
 });
 
 // Calculate totals
-orderSchema.pre('save', function(next) {
+orderSchema.pre('save', function (next) {
   // Calculate subtotal
   this.pricing.subtotal = this.items.reduce((total, item) => {
     item.subtotal = item.price * item.quantity;
     return total + item.subtotal;
   }, 0);
-  
+
   // Calculate total
-  this.pricing.total = this.pricing.subtotal + 
-                      this.pricing.shipping + 
-                      this.pricing.tax - 
-                      this.pricing.discount;
-  
+  this.pricing.total =
+    this.pricing.subtotal +
+    this.pricing.shipping +
+    this.pricing.tax -
+    this.pricing.discount;
+
   next();
 });
 

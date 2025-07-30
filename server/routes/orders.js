@@ -28,7 +28,7 @@ router.get('/', auth, async (req, res) => {
       orders,
       totalPages: Math.ceil(total / limit),
       currentPage: page,
-      total
+      total,
     });
   } catch (error) {
     console.error('Get orders error:', error);
@@ -54,7 +54,9 @@ router.get('/:id', auth, async (req, res) => {
     const isStoreOwner = order.store.owner?.toString() === req.user.id;
 
     if (!isOrderOwner && !isStoreOwner) {
-      return res.status(403).json({ message: 'Not authorized to view this order' });
+      return res
+        .status(403)
+        .json({ message: 'Not authorized to view this order' });
     }
 
     res.json({ order });
@@ -84,7 +86,7 @@ router.get('/store/:storeId', auth, async (req, res) => {
         { orderNumber: { $regex: search, $options: 'i' } },
         { 'customer.email': { $regex: search, $options: 'i' } },
         { 'customer.firstName': { $regex: search, $options: 'i' } },
-        { 'customer.lastName': { $regex: search, $options: 'i' } }
+        { 'customer.lastName': { $regex: search, $options: 'i' } },
       ];
     }
 
@@ -106,19 +108,19 @@ router.get('/store/:storeId', auth, async (req, res) => {
           totalOrders: { $sum: 1 },
           totalRevenue: { $sum: '$pricing.total' },
           pendingOrders: {
-            $sum: { $cond: [{ $eq: ['$status', 'pending'] }, 1, 0] }
+            $sum: { $cond: [{ $eq: ['$status', 'pending'] }, 1, 0] },
           },
           processingOrders: {
-            $sum: { $cond: [{ $eq: ['$status', 'processing'] }, 1, 0] }
+            $sum: { $cond: [{ $eq: ['$status', 'processing'] }, 1, 0] },
           },
           shippedOrders: {
-            $sum: { $cond: [{ $eq: ['$status', 'shipped'] }, 1, 0] }
+            $sum: { $cond: [{ $eq: ['$status', 'shipped'] }, 1, 0] },
           },
           completedOrders: {
-            $sum: { $cond: [{ $eq: ['$status', 'delivered'] }, 1, 0] }
-          }
-        }
-      }
+            $sum: { $cond: [{ $eq: ['$status', 'delivered'] }, 1, 0] },
+          },
+        },
+      },
     ]);
 
     res.json({
@@ -132,8 +134,8 @@ router.get('/store/:storeId', auth, async (req, res) => {
         pendingOrders: 0,
         processingOrders: 0,
         shippedOrders: 0,
-        completedOrders: 0
-      }
+        completedOrders: 0,
+      },
     });
   } catch (error) {
     console.error('Get store orders error:', error);
@@ -159,7 +161,14 @@ router.put('/:id/status', auth, async (req, res) => {
       return res.status(403).json({ message: 'Not authorized' });
     }
 
-    const validStatuses = ['pending', 'processing', 'shipped', 'delivered', 'cancelled', 'refunded'];
+    const validStatuses = [
+      'pending',
+      'processing',
+      'shipped',
+      'delivered',
+      'cancelled',
+      'refunded',
+    ];
     if (!validStatuses.includes(status)) {
       return res.status(400).json({ message: 'Invalid status' });
     }
@@ -185,11 +194,13 @@ router.put('/:id/status', auth, async (req, res) => {
     await order.save();
 
     // TODO: Send notification email to customer
-    console.log(`Order ${order.orderNumber} status changed from ${oldStatus} to ${status}`);
+    console.log(
+      `Order ${order.orderNumber} status changed from ${oldStatus} to ${status}`
+    );
 
     res.json({
       message: 'Order status updated successfully',
-      order
+      order,
     });
   } catch (error) {
     console.error('Update order status error:', error);
@@ -222,7 +233,9 @@ router.post('/:id/refund', auth, async (req, res) => {
     const refundAmount = amount || order.pricing.total;
 
     if (refundAmount > order.pricing.total) {
-      return res.status(400).json({ message: 'Refund amount cannot exceed order total' });
+      return res
+        .status(400)
+        .json({ message: 'Refund amount cannot exceed order total' });
     }
 
     // Update order
@@ -240,7 +253,7 @@ router.post('/:id/refund', auth, async (req, res) => {
     res.json({
       message: 'Refund processed successfully',
       order,
-      refundAmount
+      refundAmount,
     });
   } catch (error) {
     console.error('Process refund error:', error);
@@ -267,8 +280,8 @@ router.get('/analytics/overview', auth, async (req, res) => {
 
     // Calculate date range
     const now = new Date();
-    let startDate = new Date();
-    
+    const startDate = new Date();
+
     switch (timeframe) {
       case '7d':
         startDate.setDate(now.getDate() - 7);
@@ -290,8 +303,8 @@ router.get('/analytics/overview', auth, async (req, res) => {
       {
         $match: {
           store: store._id,
-          createdAt: { $gte: startDate }
-        }
+          createdAt: { $gte: startDate },
+        },
       },
       {
         $group: {
@@ -300,16 +313,16 @@ router.get('/analytics/overview', auth, async (req, res) => {
           totalRevenue: { $sum: '$pricing.total' },
           averageOrderValue: { $avg: '$pricing.total' },
           completedOrders: {
-            $sum: { $cond: [{ $eq: ['$status', 'delivered'] }, 1, 0] }
+            $sum: { $cond: [{ $eq: ['$status', 'delivered'] }, 1, 0] },
           },
           pendingOrders: {
-            $sum: { $cond: [{ $eq: ['$status', 'pending'] }, 1, 0] }
+            $sum: { $cond: [{ $eq: ['$status', 'pending'] }, 1, 0] },
           },
           cancelledOrders: {
-            $sum: { $cond: [{ $eq: ['$status', 'cancelled'] }, 1, 0] }
-          }
-        }
-      }
+            $sum: { $cond: [{ $eq: ['$status', 'cancelled'] }, 1, 0] },
+          },
+        },
+      },
     ]);
 
     // Daily breakdown
@@ -317,19 +330,19 @@ router.get('/analytics/overview', auth, async (req, res) => {
       {
         $match: {
           store: store._id,
-          createdAt: { $gte: startDate }
-        }
+          createdAt: { $gte: startDate },
+        },
       },
       {
         $group: {
           _id: {
-            $dateToString: { format: '%Y-%m-%d', date: '$createdAt' }
+            $dateToString: { format: '%Y-%m-%d', date: '$createdAt' },
           },
           orders: { $sum: 1 },
-          revenue: { $sum: '$pricing.total' }
-        }
+          revenue: { $sum: '$pricing.total' },
+        },
       },
-      { $sort: { _id: 1 } }
+      { $sort: { _id: 1 } },
     ]);
 
     res.json({
@@ -339,10 +352,10 @@ router.get('/analytics/overview', auth, async (req, res) => {
         averageOrderValue: 0,
         completedOrders: 0,
         pendingOrders: 0,
-        cancelledOrders: 0
+        cancelledOrders: 0,
       },
       dailyStats,
-      timeframe
+      timeframe,
     });
   } catch (error) {
     console.error('Get analytics error:', error);

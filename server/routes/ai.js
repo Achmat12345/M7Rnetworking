@@ -16,7 +16,7 @@ const generateAIResponse = async (prompt) => {
       const openai = new OpenAIApi(configuration);
 
       const response = await openai.createCompletion({
-        model: "text-davinci-003",
+        model: 'text-davinci-003',
         prompt: prompt,
         max_tokens: 500,
         temperature: 0.7,
@@ -41,8 +41,8 @@ router.post('/generate-product-description', auth, async (req, res) => {
     const { productName, category, features } = req.body;
 
     if (!productName || !category || !features) {
-      return res.status(400).json({ 
-        message: 'Please provide productName, category, and features' 
+      return res.status(400).json({
+        message: 'Please provide productName, category, and features',
       });
     }
 
@@ -52,11 +52,13 @@ router.post('/generate-product-description', auth, async (req, res) => {
     res.json({
       success: true,
       description,
-      prompt: process.env.NODE_ENV === 'development' ? prompt : undefined
+      prompt: process.env.NODE_ENV === 'development' ? prompt : undefined,
     });
   } catch (error) {
     console.error('Product description generation error:', error);
-    res.status(500).json({ message: 'AI generation failed', error: error.message });
+    res
+      .status(500)
+      .json({ message: 'AI generation failed', error: error.message });
   }
 });
 
@@ -68,8 +70,8 @@ router.post('/generate-store-branding', auth, async (req, res) => {
     const { storeName, niche, targetAudience } = req.body;
 
     if (!storeName || !niche || !targetAudience) {
-      return res.status(400).json({ 
-        message: 'Please provide storeName, niche, and targetAudience' 
+      return res.status(400).json({
+        message: 'Please provide storeName, niche, and targetAudience',
       });
     }
 
@@ -79,11 +81,13 @@ router.post('/generate-store-branding', auth, async (req, res) => {
     res.json({
       success: true,
       branding,
-      prompt: process.env.NODE_ENV === 'development' ? prompt : undefined
+      prompt: process.env.NODE_ENV === 'development' ? prompt : undefined,
     });
   } catch (error) {
     console.error('Store branding generation error:', error);
-    res.status(500).json({ message: 'AI generation failed', error: error.message });
+    res
+      .status(500)
+      .json({ message: 'AI generation failed', error: error.message });
   }
 });
 
@@ -95,8 +99,8 @@ router.post('/generate-marketing-copy', auth, async (req, res) => {
     const { product, platform, goal } = req.body;
 
     if (!product || !platform || !goal) {
-      return res.status(400).json({ 
-        message: 'Please provide product, platform, and goal' 
+      return res.status(400).json({
+        message: 'Please provide product, platform, and goal',
       });
     }
 
@@ -106,11 +110,13 @@ router.post('/generate-marketing-copy', auth, async (req, res) => {
     res.json({
       success: true,
       copy,
-      prompt: process.env.NODE_ENV === 'development' ? prompt : undefined
+      prompt: process.env.NODE_ENV === 'development' ? prompt : undefined,
     });
   } catch (error) {
     console.error('Marketing copy generation error:', error);
-    res.status(500).json({ message: 'AI generation failed', error: error.message });
+    res
+      .status(500)
+      .json({ message: 'AI generation failed', error: error.message });
   }
 });
 
@@ -122,8 +128,8 @@ router.post('/generate-product-ideas', auth, async (req, res) => {
     const { niche, budget, audience } = req.body;
 
     if (!niche || !budget || !audience) {
-      return res.status(400).json({ 
-        message: 'Please provide niche, budget, and audience' 
+      return res.status(400).json({
+        message: 'Please provide niche, budget, and audience',
       });
     }
 
@@ -133,11 +139,13 @@ router.post('/generate-product-ideas', auth, async (req, res) => {
     res.json({
       success: true,
       ideas,
-      prompt: process.env.NODE_ENV === 'development' ? prompt : undefined
+      prompt: process.env.NODE_ENV === 'development' ? prompt : undefined,
     });
   } catch (error) {
     console.error('Product ideas generation error:', error);
-    res.status(500).json({ message: 'AI generation failed', error: error.message });
+    res
+      .status(500)
+      .json({ message: 'AI generation failed', error: error.message });
   }
 });
 
@@ -149,8 +157,8 @@ router.post('/generate-social-strategy', auth, async (req, res) => {
     const { brand, platforms, goals } = req.body;
 
     if (!brand || !platforms || !goals) {
-      return res.status(400).json({ 
-        message: 'Please provide brand, platforms, and goals' 
+      return res.status(400).json({
+        message: 'Please provide brand, platforms, and goals',
       });
     }
 
@@ -160,11 +168,13 @@ router.post('/generate-social-strategy', auth, async (req, res) => {
     res.json({
       success: true,
       strategy,
-      prompt: process.env.NODE_ENV === 'development' ? prompt : undefined
+      prompt: process.env.NODE_ENV === 'development' ? prompt : undefined,
     });
   } catch (error) {
     console.error('Social strategy generation error:', error);
-    res.status(500).json({ message: 'AI generation failed', error: error.message });
+    res
+      .status(500)
+      .json({ message: 'AI generation failed', error: error.message });
   }
 });
 
@@ -176,8 +186,8 @@ router.post('/business-advice', auth, async (req, res) => {
     const { situation, challenge, goals } = req.body;
 
     if (!situation || !challenge || !goals) {
-      return res.status(400).json({ 
-        message: 'Please provide situation, challenge, and goals' 
+      return res.status(400).json({
+        message: 'Please provide situation, challenge, and goals',
       });
     }
 
@@ -187,11 +197,13 @@ router.post('/business-advice', auth, async (req, res) => {
     res.json({
       success: true,
       advice,
-      prompt: process.env.NODE_ENV === 'development' ? prompt : undefined
+      prompt: process.env.NODE_ENV === 'development' ? prompt : undefined,
     });
   } catch (error) {
     console.error('Business advice generation error:', error);
-    res.status(500).json({ message: 'AI generation failed', error: error.message });
+    res
+      .status(500)
+      .json({ message: 'AI generation failed', error: error.message });
   }
 });
 
@@ -203,8 +215,8 @@ router.post('/generate-email', auth, async (req, res) => {
     const { purpose, audience, product } = req.body;
 
     if (!purpose || !audience || !product) {
-      return res.status(400).json({ 
-        message: 'Please provide purpose, audience, and product' 
+      return res.status(400).json({
+        message: 'Please provide purpose, audience, and product',
       });
     }
 
@@ -214,11 +226,13 @@ router.post('/generate-email', auth, async (req, res) => {
     res.json({
       success: true,
       email,
-      prompt: process.env.NODE_ENV === 'development' ? prompt : undefined
+      prompt: process.env.NODE_ENV === 'development' ? prompt : undefined,
     });
   } catch (error) {
     console.error('Email generation error:', error);
-    res.status(500).json({ message: 'AI generation failed', error: error.message });
+    res
+      .status(500)
+      .json({ message: 'AI generation failed', error: error.message });
   }
 });
 
@@ -233,56 +247,56 @@ router.get('/available-prompts', auth, async (req, res) => {
         name: 'Product Description',
         description: 'Generate compelling product descriptions',
         endpoint: '/api/ai/generate-product-description',
-        fields: ['productName', 'category', 'features']
+        fields: ['productName', 'category', 'features'],
       },
       {
         id: 'store-branding',
         name: 'Store Branding',
         description: 'Create complete brand identity',
         endpoint: '/api/ai/generate-store-branding',
-        fields: ['storeName', 'niche', 'targetAudience']
+        fields: ['storeName', 'niche', 'targetAudience'],
       },
       {
         id: 'marketing-copy',
         name: 'Marketing Copy',
         description: 'Generate marketing content for various platforms',
         endpoint: '/api/ai/generate-marketing-copy',
-        fields: ['product', 'platform', 'goal']
+        fields: ['product', 'platform', 'goal'],
       },
       {
         id: 'product-ideas',
         name: 'Product Ideas',
         description: 'Brainstorm new product concepts',
         endpoint: '/api/ai/generate-product-ideas',
-        fields: ['niche', 'budget', 'audience']
+        fields: ['niche', 'budget', 'audience'],
       },
       {
         id: 'social-strategy',
         name: 'Social Media Strategy',
         description: 'Create comprehensive social media plans',
         endpoint: '/api/ai/generate-social-strategy',
-        fields: ['brand', 'platforms', 'goals']
+        fields: ['brand', 'platforms', 'goals'],
       },
       {
         id: 'business-advice',
         name: 'Business Advice',
         description: 'Get personalized business guidance',
         endpoint: '/api/ai/business-advice',
-        fields: ['situation', 'challenge', 'goals']
+        fields: ['situation', 'challenge', 'goals'],
       },
       {
         id: 'email-marketing',
         name: 'Email Marketing',
         description: 'Generate email marketing content',
         endpoint: '/api/ai/generate-email',
-        fields: ['purpose', 'audience', 'product']
-      }
+        fields: ['purpose', 'audience', 'product'],
+      },
     ];
 
     res.json({
       success: true,
       prompts: availablePrompts,
-      hasOpenAI: !!process.env.OPENAI_API_KEY
+      hasOpenAI: !!process.env.OPENAI_API_KEY,
     });
   } catch (error) {
     console.error('Get prompts error:', error);

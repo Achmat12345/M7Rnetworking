@@ -30,7 +30,7 @@ router.get('/', async (req, res) => {
       stores,
       totalPages: Math.ceil(total / limit),
       currentPage: page,
-      total
+      total,
     });
   } catch (error) {
     console.error('Get stores error:', error);
@@ -49,7 +49,7 @@ router.get('/:slug', async (req, res) => {
         path: 'products',
         match: { isActive: true },
         select: 'name description price images category isFeatured sales',
-        options: { limit: 20 }
+        options: { limit: 20 },
       });
 
     if (!store) {
@@ -79,7 +79,10 @@ router.post('/', auth, async (req, res) => {
     }
 
     // Generate unique slug
-    let slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+    let slug = name
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)+/g, '');
     const existingStore = await Store.findOne({ slug });
     if (existingStore) {
       slug += '-' + Math.random().toString(36).substr(2, 4);
@@ -91,22 +94,19 @@ router.post('/', auth, async (req, res) => {
       description: description || '',
       theme: theme || {},
       settings: settings || {},
-      owner: req.user.id
+      owner: req.user.id,
     });
 
     await store.save();
 
     // Add store to user's stores array
-    await User.findByIdAndUpdate(
-      req.user.id,
-      { $push: { stores: store._id } }
-    );
+    await User.findByIdAndUpdate(req.user.id, { $push: { stores: store._id } });
 
     await store.populate('owner', 'username profile');
 
     res.status(201).json({
       message: 'Store created successfully',
-      store
+      store,
     });
   } catch (error) {
     console.error('Create store error:', error);
@@ -127,15 +127,24 @@ router.put('/:id', auth, async (req, res) => {
 
     // Check ownership
     if (store.owner.toString() !== req.user.id) {
-      return res.status(403).json({ message: 'Not authorized to update this store' });
+      return res
+        .status(403)
+        .json({ message: 'Not authorized to update this store' });
     }
 
     const updateFields = [
-      'name', 'description', 'logo', 'banner', 'theme', 
-      'settings', 'contact', 'social', 'seo'
+      'name',
+      'description',
+      'logo',
+      'banner',
+      'theme',
+      'settings',
+      'contact',
+      'social',
+      'seo',
     ];
 
-    updateFields.forEach(field => {
+    updateFields.forEach((field) => {
       if (req.body[field] !== undefined) {
         if (typeof req.body[field] === 'object' && req.body[field] !== null) {
           store[field] = { ...store[field], ...req.body[field] };
@@ -147,8 +156,14 @@ router.put('/:id', auth, async (req, res) => {
 
     // Update slug if name changed
     if (req.body.name && req.body.name !== store.name) {
-      const newSlug = req.body.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
-      const existingStore = await Store.findOne({ slug: newSlug, _id: { $ne: store._id } });
+      const newSlug = req.body.name
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)+/g, '');
+      const existingStore = await Store.findOne({
+        slug: newSlug,
+        _id: { $ne: store._id },
+      });
       if (!existingStore) {
         store.slug = newSlug;
       }
@@ -159,7 +174,7 @@ router.put('/:id', auth, async (req, res) => {
 
     res.json({
       message: 'Store updated successfully',
-      store
+      store,
     });
   } catch (error) {
     console.error('Update store error:', error);
@@ -180,14 +195,13 @@ router.delete('/:id', auth, async (req, res) => {
 
     // Check ownership
     if (store.owner.toString() !== req.user.id) {
-      return res.status(403).json({ message: 'Not authorized to delete this store' });
+      return res
+        .status(403)
+        .json({ message: 'Not authorized to delete this store' });
     }
 
     // Remove store from user's stores array
-    await User.findByIdAndUpdate(
-      req.user.id,
-      { $pull: { stores: store._id } }
-    );
+    await User.findByIdAndUpdate(req.user.id, { $pull: { stores: store._id } });
 
     // TODO: Handle related products and orders
     await Store.findByIdAndDelete(req.params.id);
@@ -230,12 +244,14 @@ router.post('/:id/pages', auth, async (req, res) => {
 
     // Check ownership
     if (store.owner.toString() !== req.user.id) {
-      return res.status(403).json({ message: 'Not authorized to edit this store' });
+      return res
+        .status(403)
+        .json({ message: 'Not authorized to edit this store' });
     }
 
     // If this is the home page, unset other home pages
     if (isHomePage) {
-      store.pages.forEach(page => {
+      store.pages.forEach((page) => {
         page.isHomePage = false;
       });
     }
@@ -243,7 +259,7 @@ router.post('/:id/pages', auth, async (req, res) => {
     const pageSlug = slug || name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
 
     // Check if page exists
-    const existingPageIndex = store.pages.findIndex(p => p.slug === pageSlug);
+    const existingPageIndex = store.pages.findIndex((p) => p.slug === pageSlug);
 
     if (existingPageIndex > -1) {
       // Update existing page
@@ -252,7 +268,7 @@ router.post('/:id/pages', auth, async (req, res) => {
         name,
         content,
         isHomePage: !!isHomePage,
-        isPublished: true
+        isPublished: true,
       };
     } else {
       // Create new page
@@ -261,7 +277,7 @@ router.post('/:id/pages', auth, async (req, res) => {
         slug: pageSlug,
         content,
         isHomePage: !!isHomePage,
-        isPublished: true
+        isPublished: true,
       });
     }
 
@@ -269,7 +285,7 @@ router.post('/:id/pages', auth, async (req, res) => {
 
     res.json({
       message: 'Page saved successfully',
-      page: store.pages.find(p => p.slug === pageSlug)
+      page: store.pages.find((p) => p.slug === pageSlug),
     });
   } catch (error) {
     console.error('Save page error:', error);
@@ -282,13 +298,18 @@ router.post('/:id/pages', auth, async (req, res) => {
 // @access  Public
 router.get('/:slug/pages/:pageSlug', async (req, res) => {
   try {
-    const store = await Store.findOne({ slug: req.params.slug, isActive: true });
+    const store = await Store.findOne({
+      slug: req.params.slug,
+      isActive: true,
+    });
 
     if (!store) {
       return res.status(404).json({ message: 'Store not found' });
     }
 
-    const page = store.pages.find(p => p.slug === req.params.pageSlug && p.isPublished);
+    const page = store.pages.find(
+      (p) => p.slug === req.params.pageSlug && p.isPublished
+    );
 
     if (!page) {
       return res.status(404).json({ message: 'Page not found' });
@@ -306,11 +327,10 @@ router.get('/:slug/pages/:pageSlug', async (req, res) => {
 // @access  Private
 router.get('/:id/analytics', auth, async (req, res) => {
   try {
-    const store = await Store.findById(req.params.id)
-      .populate({
-        path: 'products',
-        select: 'name views sales revenue createdAt'
-      });
+    const store = await Store.findById(req.params.id).populate({
+      path: 'products',
+      select: 'name views sales revenue createdAt',
+    });
 
     if (!store) {
       return res.status(404).json({ message: 'Store not found' });
@@ -318,25 +338,28 @@ router.get('/:id/analytics', auth, async (req, res) => {
 
     // Check ownership
     if (store.owner.toString() !== req.user.id) {
-      return res.status(403).json({ message: 'Not authorized to view analytics' });
+      return res
+        .status(403)
+        .json({ message: 'Not authorized to view analytics' });
     }
 
     const analytics = {
       overview: store.analytics,
-      products: store.products.map(p => ({
+      products: store.products.map((p) => ({
         id: p._id,
         name: p.name,
         views: p.views,
         sales: p.sales,
         revenue: p.revenue,
-        conversionRate: p.views > 0 ? (p.sales / p.views * 100).toFixed(2) : 0
+        conversionRate:
+          p.views > 0 ? ((p.sales / p.views) * 100).toFixed(2) : 0,
       })),
       summary: {
         totalProducts: store.products.length,
         totalViews: store.products.reduce((sum, p) => sum + p.views, 0),
         totalSales: store.products.reduce((sum, p) => sum + p.sales, 0),
-        totalRevenue: store.products.reduce((sum, p) => sum + p.revenue, 0)
-      }
+        totalRevenue: store.products.reduce((sum, p) => sum + p.revenue, 0),
+      },
     };
 
     res.json({ analytics });
